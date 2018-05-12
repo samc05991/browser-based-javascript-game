@@ -28,19 +28,38 @@ server.listen(5000, function() {
 //List of players
 var players = {};
 
+var numberOfPlayers = 0;
+
+//List of soldiers
+var soldiers = {};
+
+var numberOfSoldiers = 0;
+
 //When there is a new connection set up sockets
 io.on('connection', function(socket) {
     console.log(io.eio);
     socket.on('new player', function() {
+        numberOfPlayers++;
         players[socket.id] = {
+            id: socket.id,
+            position: numberOfPlayers,
             x: 300,
             y: 300
         };
     });
 
+    socket.on('new soldier', function() {
+        numberOfSoldiers++
+        soldiers[numberOfSoldiers] = {
+            owner: socket.id,
+            x: addSoldierPosition(socket.id),
+            y: addSoldierPosition(socket.id)
+        }
+    });
+
     socket.on('movement', function(data) {
         var player = players[socket.id] || {};
-        io.sockets.emit('message',player);
+        // io.sockets.emit('message',player);
         if (data.left) {
         player.x -= 5;
         }
@@ -58,5 +77,14 @@ io.on('connection', function(socket) {
 
 //emit 60times per second the position of the players
 setInterval(function() {
-  io.sockets.emit('state', players);
+  io.sockets.emit('state', players, soldiers);
+  moveSoldiers();
 }, 1000 / 60);
+
+function addSoldierPosition(playerId){
+    return players[playerId].position === 1 ? 100 : 400;
+}
+
+function moveSoldiers(){
+
+}

@@ -19,18 +19,26 @@ var movement = {
 function initializeEventEmitters(){
     document.addEventListener('keydown', function(event) {
         switch (event.keyCode) {
+
             case 65: // A
             movement.left = true;
             break;
+
             case 87: // W
             movement.up = true;
             break;
+
             case 68: // D
             movement.right = true;
             break;
+
             case 83: // S
             movement.down = true;
             break;
+
+            // case 32: // SPACE
+            // useBasicAttack();
+            // break;
         }
     });
     
@@ -52,6 +60,10 @@ function initializeEventEmitters(){
     });
 }
 
+function addSoldier(){
+    socket.emit('new soldier');
+}
+
 function initializeSockets(){
     /**
      * Sent from server to console.log()
@@ -65,7 +77,7 @@ function initializeSockets(){
      * Sent from server to update the screen
      * param {Array} players
      */
-    socket.on('state', function(players) {
+    socket.on('state', function(players, soldiers) {
         context.clearRect(0, 0, 800, 600);
         context.fillStyle = 'green';
         
@@ -75,6 +87,16 @@ function initializeSockets(){
             context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
             context.fill();
         }
+
+        context.fillStyle = 'red';
+        
+        for (var id in soldiers) {
+            var soldier = soldiers[id];
+            context.beginPath();
+            context.arc(soldier.x, soldier.y, 10, 0, 1 * Math.PI);
+            context.fill();
+        }
+        console.log(soldiers);
     });
 }
 
